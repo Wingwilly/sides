@@ -342,7 +342,7 @@
   .stp-cd { position: absolute; inset: 0; display: grid; place-items: center; font-size: 7rem; font-weight: 700; color: #fff; text-shadow: 0 2px 18px rgba(0,0,0,.7); background: rgba(0,0,0,.25); }
   .stp-cd[hidden], .stp-grid[hidden] { display: none; }
   .stp-grid { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to right, transparent 33.2%, rgba(255,255,255,.35) 33.3%, transparent 33.5%, transparent 66.5%, rgba(255,255,255,.35) 66.6%, transparent 66.8%), linear-gradient(to bottom, transparent 33.2%, rgba(255,255,255,.35) 33.3%, transparent 33.5%, transparent 66.5%, rgba(255,255,255,.35) 66.6%, transparent 66.8%); }
-  .stp-script { border: 1px solid var(--rule); border-radius: 12px; padding: .8rem 1rem; background: var(--surface); min-height: 12rem; max-height: 52vh; overflow-y: auto; }
+  .stp-script { position: relative; border: 1px solid var(--rule); border-radius: 12px; padding: .8rem 1rem; background: var(--surface); min-height: 12rem; max-height: 52vh; overflow-y: auto; }
   .stp-ln { margin: 0 0 .9rem; opacity: .55; }
   .stp-ln.cur { opacity: 1; }
   .stp-ln.dim, .stp-ln.dim.cur { opacity: .14; }
@@ -6254,6 +6254,7 @@
         try { var sl = $("stepLook"); if (sl && sl.offsetParent && !kkAutoDone && !Object.keys(voiceChoice).length && state.cast.length) { kkAutoDone = true; kkAll(); } } catch (er) {}
         advUi();
         var w = kk.waiters; kk.waiters = []; w.forEach(function (x) { x.res(); });
+        setTimeout(function () { try { kkPiece("Ready now.", "af_heart").catch(function () {}); } catch (er) {} }, 400);   // warms the engine so the first voice you tap plays sooner
       } else if (m.type === "error") { kkFail("Kokoro could not load: " + kkClean(m.msg) + ". Check the connection and try again."); }
       else if (m.type === "audio" || m.type === "fail") {
         var r = kk.reqs[m.id]; if (!r) return; delete kk.reqs[m.id];
@@ -7772,7 +7773,7 @@
       } else { var t2 = doc.createElement("div"); t2.className = "tx"; t2.style.fontStyle = "italic"; t2.textContent = b.text; d.appendChild(t2); }
       box.appendChild(d);
     }
-    var cur = box.querySelector(".cur"); if (cur) box.scrollTop = Math.max(0, cur.offsetTop - 40);
+    var cur = box.querySelector(".cur"); if (cur) box.scrollTop = Math.max(0, cur.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop - 40);
   }
   function stpRender() {
     stpLines($("stpScript"), stp.k);
@@ -7984,7 +7985,13 @@
     var bar = $("stpTkBar"), box = $("stpTakes"); bar.innerHTML = ""; box.innerHTML = "";
     var mine = stp.takes.filter(function (t) { return t.scene === tkScene(); }), shown = mine.filter(function (t) { return !tk.onlyStar || t.star; });
     var top = document.createElement("div"); top.className = "tkrow";
-    if (tkFolderMode()) {
+    if (tkFolderMode() && !tk.dir) {
+      var f1 = document.createElement("div"); f1.className = "stp-note"; f1.style.cssText = "flex:1 1 100%;font-weight:600";
+      f1.textContent = "Step 1: choose a folder on your computer. Every take you record is saved there as a video file, so nothing is lost if you close the tab.";
+      top.appendChild(f1);
+      top.appendChild(tkBtn("Choose folder", function () { tkChoose(); }, "primary"));
+      var f2 = document.createElement("span"); f2.textContent = "Then press Record."; top.appendChild(f2);
+    } else if (tkFolderMode()) {
       var fl = document.createElement("span"); fl.innerHTML = ""; fl.appendChild(document.createTextNode(tk.dir ? "Takes save to the folder " : "Takes save to a folder you choose. "));
       if (tk.dir) { var fb = document.createElement("strong"); fb.textContent = tk.dirName; fl.appendChild(fb); }
       top.appendChild(fl);
