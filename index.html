@@ -2042,7 +2042,7 @@
     nrows.forEach(function (r) {
       r.its.sort(function (a, b) { return a.transform[4] - b.transform[4]; });
       var t = r.its.map(function (it) { return it.str; }).join("").replace(/\s+/g, " ").trim(), mm;
-      var ar = hOf(r.its[0]) > body * 1.6 && (STAMP_S.test(t) || STAMP_E.test(t)) ? arrowRow(r.its[0]) : null;
+      var ar = hOf(r.its[0]) > body * 1.15 && (STAMP_S.test(t) || STAMP_E.test(t)) ? arrowRow(r.its[0]) : null;
       var tag = function (o) { if (r.its[0].aid) o.aid = r.its[0].aid; if (r.its[0].laid) o.laid = r.its[0].laid; return o; };
       if (/START\s*=>/i.test(t) || STAMP_S.test(t)) out.push(tag({ y: (ar ? speechEdge(ar, 1).y : beside(r.y)) + 0.5, text: "START =>" }));
       else if (/=>\s*END/i.test(t) || STAMP_E.test(t)) out.push(tag({ y: (ar ? speechEdge(ar, -1).y : beside(r.y)) - 0.5, text: "=> END" }));
